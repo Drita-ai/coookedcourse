@@ -18,3 +18,29 @@
         cursor: pointer;
     }
 }
+
+
+@layer components {
+    .custom-glow {
+        @apply bg-gradient-to-br from-[#0f0f0f] via-[#1a1a1a] to-[#0f0f0f] text-white rounded-md p-5 shadow-lg border border-neutral-800 relative overflow-hidden;
+    }
+}
+
+@keyframes shine {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.animate-shine::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent);
+    animation: shine 2s linear infinite;
+    transform: translateX(-100%);
+}

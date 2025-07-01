@@ -1,5 +1,5 @@
 import React from 'react'
-import { FaArrowRightLong } from "react-icons/fa6";
+import SearchBox from '../components/CookedCourse/SearchBox';
 
 function CookedCourse() {
     return (
@@ -10,12 +10,7 @@ function CookedCourse() {
 
                 <p className='text-xl ml-2'>What would you like to learn today?</p>
 
-                <div className='relative'>
-                    <textarea id='' cols='100' rows='6' placeholder='Tailor your course...' className='resize-none p-3 mt-10 border rounded-xl'></textarea>
-                    <button className='btn-search absolute bottom-5 right-30'>
-                        <FaArrowRightLong />
-                    </button>
-                </div>
+                <SearchBox />
             </div>
         </div>
     )
