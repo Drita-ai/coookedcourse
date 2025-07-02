@@ -10,9 +10,9 @@ const navItems = [
 
 function LeftFloatingBox() {
     const [loaded, setLoaded] = useState(false);
+    const [active, setActive] = useState(0);
 
     useEffect(() => {
-        // Trigger animation on mount
         setTimeout(() => setLoaded(true), 100);
     }, []);
 
@@ -21,8 +21,9 @@ function LeftFloatingBox() {
             className={`
         fixed left-0 top-1/4
         h-1/2 w-20
-        bg-gray-900 text-white shadow-lg
-        rounded-r-2xl flex flex-col items-center justify-around
+        bg-black/60 backdrop-blur-lg border-r border-white/10
+        text-white rounded-r-3xl shadow-xl
+        flex flex-col items-center justify-around
         transition-all duration-700 ease-out
         ${loaded ? 'translate-x-0 opacity-100' : '-translate-x-10 opacity-0'}
       `}
@@ -30,10 +31,22 @@ function LeftFloatingBox() {
             {navItems.map((item, index) => (
                 <div
                     key={index}
-                    className="group relative flex items-center justify-center p-3 rounded-xl hover:bg-gray-800 transition-all duration-300 cursor-pointer"
+                    className="group relative flex items-center justify-center w-full"
+                    onClick={() => setActive(index)}
                 >
-                    {item.icon}
-                    <span className="absolute left-20 bg-gray-800 text-white text-sm px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    {/* Active indicator */}
+                    <div className={`absolute left-0 h-10 w-1 rounded-r bg-cyan-400 transition-all ${active === index ? 'opacity-100' : 'opacity-0'}`}></div>
+
+                    <div
+                        className={`m-2 p-3 rounded-xl transition-all duration-300 cursor-pointer 
+              hover:bg-white/10 hover:shadow-md hover:scale-110 
+              ${active === index ? 'bg-white/10 scale-110' : ''}`}
+                    >
+                        {item.icon}
+                    </div>
+
+                    {/* Tooltip */}
+                    <span className="absolute left-24 bg-black text-white text-sm px-2 py-1 rounded shadow-md opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-300 whitespace-nowrap">
                         {item.label}
                     </span>
                 </div>
