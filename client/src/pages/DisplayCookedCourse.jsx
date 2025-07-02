@@ -1,18 +1,15 @@
 import React from 'react'
-import { useLocation } from 'react-router-dom'
+import CookedCourseHeader from '../components/DisplayCookedCourse/CookedCourseHeader'
+import CookedCourseBody from '../components/DisplayCookedCourse/CookedCourseBody'
 
 function DisplayCookedCourse() {
-    // Retrieving Syllabus
-    const { state } = useLocation();
-    const { syllabus } = state;
-
     return (
         <div className='py-10 px-50'>
-            <div className="custom-glow">
-                <div className="animate-shine">
-                    Displaying courses for {syllabus}
-                </div>
-            </div>
+            {/* Header for Searched Course */}
+            <CookedCourseHeader />
+
+            {/* Body for Searched Course */}
+            <CookedCourseBody />
         </div>
     )
 }

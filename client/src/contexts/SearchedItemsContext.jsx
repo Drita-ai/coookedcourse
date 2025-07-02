@@ -30,8 +30,7 @@ function SearchedItemsProvider({ children }) {
         try {
             setIsLoading(true);
             const response = await axios.get(`${BASE_URL}/items`);
-            const data = await response.json()
-            setSearchedItems(data)
+            setSearchedItems(response.data)
         } catch (err) {
             console.log("There was an error loading the data..." + err)
         } finally {
