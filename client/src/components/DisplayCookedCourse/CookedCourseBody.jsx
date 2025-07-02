@@ -24,7 +24,7 @@ function CookedCourseBody() {
     if (isLoading) return <SearchedItemSkeleton />
 
     return (
-        <div className='grid grid-cols-3 gap-4 my-10'>
+        <div className='my-10'>
             {searchedItems.length > 0 && searchedItems.map((item) =>
                 <CookedCourseItemCard url={item.snippet.thumbnails.high.url} id={item.id.videoId || item.id.playlistId} />
             )}
