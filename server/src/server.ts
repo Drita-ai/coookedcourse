@@ -2,7 +2,7 @@ import dotenv from 'dotenv'
 
 import app from './app';
 
-dotenv.config({ path: './../.env' })
+dotenv.config({ path: './.env' })
 
 // Catching Uncaught Exception
 process.on("uncaughtException", (err) => {
@@ -12,9 +12,9 @@ process.on("uncaughtException", (err) => {
     process.exit(1);
 });
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 3300
 
-const server = app.listen(PORT, () => { console.log("listening on port 3000") })
+const server = app.listen(PORT, () => { console.log(`listening on port ${PORT}`) })
 
 process.on("unhandledRejection", (err: Error) => {
     console.log(err.name, err.message);
