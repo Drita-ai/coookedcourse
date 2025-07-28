@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { LLMPassedSyllabusYoutubeTopics } from '../../types/playlistMaker';
 
 /**
  * Returns playlist ids
@@ -10,7 +11,7 @@ export const extractPlaylistIds = (playlists: any[]): string[] => {
 /**
  * A helper function that performs an axios GET request with a retry mechanism.
  */
-const axiosGetWithRetry = async (url: string, retries: number) => {
+export const axiosGetWithRetry = async (url: string, retries: number = 3) => {
     for (let attempt = 1; attempt <= retries; attempt++) {
         try {
             const response = await axios.get(url);
@@ -26,6 +27,29 @@ const axiosGetWithRetry = async (url: string, retries: number) => {
         }
     }
 };
+
+/**
+ * A helper function that performs an axios POST request with a retry mechanism
+ */
+export const axiosPostWithRetry =
+    async (url: string,
+        payload: LLMPassedSyllabusYoutubeTopics,
+        retries: number = 3) => {
+        for (let attempt = 1; attempt < retries; attempt++) {
+            try {
+                const response = await axios.post(url, payload)
+                return response.data
+            } catch (err) {
+                console.error(`Attempt ${attempt} failed for URL: ${url}. Retrying...`);
+
+                if (attempt == retries) {
+                    throw err
+                }
+                // Wait 1 second before the next attempt
+                await new Promise(res => setTimeout(res, 1000));
+            }
+        }
+    }
 
 /**
  * Fetches all video items from a list of YouTube playlist URLs
@@ -52,7 +76,7 @@ export const fetchAllVideosWithRetry = (URLS: string[], retries = 3) => {
                 nextPageToken = response.nextPageToken;
                 isFirstRequest = false;
 
-            } while (nextPageToken); // Loop until there are no more pages
+            } while (nextPageToken);
 
             return allItems;
         })()
