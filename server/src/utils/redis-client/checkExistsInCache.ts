@@ -12,10 +12,10 @@ export const checkInCacheAndSet = async (key: string, URL: string) => {
     // Check the API Response in Cache
     if (!(await client.get(key))) {
         // Fetch the Playlist List
-        const playlistsItem = await axios.get(URL)
+        const response = await axios.get(URL)
 
         // Store it's result in cache
-        await client.set(CK_COOKED_PLAYLIST_LIST, JSON.stringify(playlistsItem!.data))
+        await client.set(key, JSON.stringify(response!.data))
     }
 }
 
