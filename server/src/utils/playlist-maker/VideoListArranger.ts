@@ -90,5 +90,7 @@ export class VideoListArranger {
 
         // Pass to LLM to analyze
         this.analyzedSyllabus = await axiosPostWithRetry(process.env.LLM_ANALYZE_URL!, payload)
+
+        return this.analyzedSyllabus;
     }
 }
