@@ -17,13 +17,11 @@ const generateCourse = catchAsync(async (req: Request, res: Response, next: Next
 
     const subject: string = req.body.subject;
 
-    // 2) GET Playlists List
+    // 2) Playlist Maker Instance
     const pm = new PlaylistMaker(extractedTopics, subject);
-    const searchedPlaylists = await pm.fetchPlaylistVideos()
+    const searchedPlaylists = await pm.fetchPlaylistVideos(req._cooked_client, req.query)
 
-    console.log(searchedPlaylists)
-
-    res.status(200).json({ "message": "success" })
+    res.status(200).json({ "message": "success", data: searchedPlaylists })
 })
 
 export default { generateCourse }
