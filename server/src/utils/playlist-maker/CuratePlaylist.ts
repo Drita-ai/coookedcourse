@@ -4,13 +4,14 @@ import { CK_CHANNELS_WITH_VIDEOS_DETAILS, CK_CHANNELS_WITH_VIDEOS_TITLES, CK_COO
 import { checkInCacheAndSet, fetchTemplate } from '../redis-client/checkExistsInCache';
 import { extractPlaylistIds, fetchAllVideosWithRetry } from './playlistMakerUtils';
 import { VideoListArranger } from './VideoListArranger';
-import type { VideoListItem } from '../../types/playlistMaker';
+import type { CollegeAnalysis, QueryString, VideoListItem } from '../../types/playlistMaker';
+import { APIFeature } from '../APIFeatures';
 
 export class CuratePlaylist {
     private topics: CookedTopics;
     private subject: string;
     private SEARCH_PLAYLIST_URL: string;
-    extractedTopics?: string[];
+    public extractedTopics?: string[];
 
     constructor(topics: CookedTopics, subject: string) {
         this.topics = topics
@@ -43,7 +44,7 @@ export class CuratePlaylist {
     /**
      * Funtion to return all videos of related PLAYLIST 
      */
-    async fetchPlaylistVideos(clientToken: string = '') {
+    async fetchPlaylistVideos(clientToken: string = '', query: QueryString) {
         // Fetch Playlists
         const fetchedPlaylists = await this.fetchPlaylists(clientToken)
 
@@ -74,11 +75,15 @@ export class CuratePlaylist {
         }
 
         channelsListWithTopics = JSON.parse((await redisClient.get(`${CK_CHANNELS_WITH_VIDEOS_TITLES}#${clientToken}`))!)
-        const channelListWithVideoDetails = JSON.parse((await redisClient.get(`${CK_CHANNELS_WITH_VIDEOS_DETAILS}#${clientToken}`))!)
+
+        // TODO: Will SEND accordingly
+        const channelListWithVideoDetails = JSON.parse((await redisClient.get(`${CK_CHANNELS_WITH_VIDEOS_DETAILS}#${clientToken}`))!);
 
         // GET Analyzed topics 
-        const analyzedTopics = (await vla!.topicComparison(channelsListWithTopics!, this.topics))!
+        const analyzedTopics = (await vla!.topicComparison(channelsListWithTopics!, this.topics))!;
 
-        return { channelListWithVideoDetails, analyzedTopics }
+        const finalAnalyzedTopics = new APIFeature(analyzedTopics as unknown as CollegeAnalysis[], query).calculateFields().filter().sort().limitFields().paginate();
+
+        return finalAnalyzedTopics.data
     }
 }

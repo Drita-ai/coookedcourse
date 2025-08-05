@@ -5,7 +5,7 @@ import { axiosPostWithRetry } from './playlistMakerUtils';
 export class VideoListArranger {
     private videoList;
     private channelsListWithTopics?: VideoListItem[]
-    private analyzedSyllabus?: AnalyzedSyllabus;
+    private analyzedSyllabus?: AnalyzedSyllabus[];
     private channelsListWithVideoDetails?: any;
 
     constructor(videoList: any = '') {
