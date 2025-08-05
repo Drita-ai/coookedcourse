@@ -12,6 +12,12 @@ export interface VideoListItem {
     [channelName: string]: string[]
 }
 
+export interface VideoItemDetails {
+    itemId?: string,
+    title?: string,
+    videoId?: string
+}
+
 /**
  * Analyzed Topics 
  */
@@ -21,9 +27,9 @@ interface MatchedItemList {
 }
 
 interface MatchedItemDetails {
-    matchedYoutubeTitles: MatchedItemDetails,
-    matchedSyllabusTopics: MatchedItemDetails,
-    unmatchedSyllabusTopics: MatchedItemDetails,
+    matchedYoutubeTitles: MatchedItemList,
+    matchedSyllabusTopics: MatchedItemList,
+    unmatchedSyllabusTopics: MatchedItemList,
 }
 
 interface AnalyzedMainTopics {
@@ -35,8 +41,8 @@ interface AnalyzedUnit {
 }
 
 export interface AnalyzedSyllabus {
-    [channelName: string]: AnalyzedUnit[],
-    "unmatchedYoutubeTopics": MatchedItemDetails
+    unmatchedYoutubeTopics: MatchedItemList;
+    [channelName: string]: AnalyzedUnit[] | MatchedItemList;
 }
 
 /**
@@ -46,3 +52,30 @@ export interface LLMPassedSyllabusYoutubeTopics {
     syllabus_topics: CookedTopics,
     channel_topics: VideoListItem[]
 }
+
+/**
+ * Types for APIFeatures
+ */
+export interface MainTopicAnalysis {
+    title: string;
+    details: MatchedItemDetails;
+}
+
+export interface UnitAnalysis {
+    unitNumber: number;
+    title: string;
+    mainTopics: MainTopicAnalysis[];
+}
+
+export type RawUnitData = { [unit: string]: { [mainTopic: string]: MatchedItemDetails }[] }[];
+
+export interface CollegeAnalysis {
+    collegeName: string;
+    units: UnitAnalysis[];
+    unmatchedYoutubeTopics: MatchedItemList;
+    overallCoverage?: number;
+    totalMatchedVideos?: number;
+}
+
+// Helper type for Express query object
+export type QueryString = import('qs').ParsedQs;
