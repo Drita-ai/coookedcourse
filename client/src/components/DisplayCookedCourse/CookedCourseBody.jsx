@@ -17,7 +17,7 @@ function CookedCourseBody() {
 
     useEffect(function () {
         fetchVideosAndPlaylists()
-    }, [])
+    }, [fetchVideosAndPlaylists])
 
     console.log(searchedItems, isLoading)
 
