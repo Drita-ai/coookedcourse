@@ -1,19 +1,20 @@
-import React from 'react'
-import SearchBox from '../components/CookedCourse/SearchBox';
+import Header from '../components/CookedCourse/Header';
+import MainBody from '../components/CookedCourse/MainBody';
 
 function CookedCourse() {
     return (
-        <div className='h-screen w-full pl-[12em] pt-[10em] pb-[4em] pr-[5em]'>
-            <div>
-                {/* TO-DO: Why margin to the Left? */}
-                <p className='p-main inline m-0'>Hi there,</p>
+        <div className="min-h-screen w-full bg-black text-white flex items-center justify-center p-4">
+            <div className="w-full max-w-3xl">
+                <Header />
 
-                <p className='text-xl ml-2'>What would you like to learn today?</p>
+                <MainBody />
 
-                <SearchBox />
+                <footer className="text-center mt-8 text-neutral-600 text-sm">
+                    <p>&copy; cookedcourse</p>
+                </footer>
             </div>
         </div>
-    )
+    );
 }
 
 export default CookedCourse
