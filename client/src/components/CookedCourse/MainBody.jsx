@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import SubjectInput from './InputsBox/SubjectInput';
 import SyllabusInput from './InputsBox/SyllabusInput';
+import Spinner from '../Spinner';
 
 // SVG Icon for the Trash Can
 const TrashIcon = ({ className }) => (
@@ -108,12 +109,13 @@ function MainBody() {
                     </button>
                 </div>
 
+                {isLoading && (<Spinner />)}
+
                 {/* Submission Confirmation Message */}
-                {isGenerated && (
+                {/* {isGenerated && (
                     <div className="mt-6 text-center text-green-400 bg-green-900/50 border border-green-700 rounded-lg p-3 animate-fade-in">
-                        Success! Check the console for the structured course data.
                     </div>
-                )}
+                )} */}
             </form>
         </div>
     )
