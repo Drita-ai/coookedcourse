@@ -79,7 +79,7 @@ function MainBody() {
         <div className="bg-neutral-950/60 backdrop-blur-xl border border-neutral-800 rounded-2xl p-6 md:p-8 shadow-2xl shadow-purple-900/10">
             <form onSubmit={handleSubmit}>
                 {/* Subject Input Box */}
-                <SubjectInput subject={subject} setSubject={setSubject} />
+                <SubjectInput subject={subject} onSetSubject={setSubject} />
 
                 {/* Unit Input Box */}
                 <div className="mb-4">
