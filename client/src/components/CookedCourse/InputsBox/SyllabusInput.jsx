@@ -1,6 +1,6 @@
 import React from 'react'
 
-function SyllabusInput({ units, removeUnit, handleUnitChange }) {
+function SyllabusInput({ units, onRemoveUnit, onUnitChange }) {
 
 
     return (
@@ -12,7 +12,7 @@ function SyllabusInput({ units, removeUnit, handleUnitChange }) {
                         {units.length > 1 && (
                             <button
                                 type="button"
-                                onClick={() => removeUnit(unit.id)}
+                                onClick={() => onRemoveUnit(unit.id)}
                                 className="text-neutral-500 hover:text-red-500 transition-colors duration-200"
                                 aria-label="Remove Unit"
                             >
@@ -28,7 +28,7 @@ function SyllabusInput({ units, removeUnit, handleUnitChange }) {
                                 id={`unit-name-${unit.id}`}
                                 name="name"
                                 value={unit.name}
-                                onChange={(e) => handleUnitChange(unit.id, e)}
+                                onChange={(e) => onUnitChange(unit.id, e)}
                                 placeholder="e.g., Introduction"
                                 required
                                 className="w-full bg-neutral-800 border-neutral-700 rounded-md py-2 px-3 focus:ring-1 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all duration-200"
@@ -41,7 +41,7 @@ function SyllabusInput({ units, removeUnit, handleUnitChange }) {
                                 id={`unit-topics-${unit.id}`}
                                 name="topics"
                                 value={unit.topics}
-                                onChange={(e) => handleUnitChange(unit.id, e)}
+                                onChange={(e) => onUnitChange(unit.id, e)}
                                 placeholder="Wave-particle duality..."
                                 required
                                 className="w-full bg-neutral-800 border-neutral-700 rounded-md py-2 px-3 focus:ring-1 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all duration-200"

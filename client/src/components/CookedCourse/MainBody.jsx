@@ -85,8 +85,8 @@ function MainBody() {
                 <div className="mb-4">
                     <h2 className="text-lg font-medium text-neutral-300 mb-3">Syllabus Units</h2>
                     <div className="space-y-4">
-                        <SyllabusInput handleUnitChange={handleUnitChange}
-                            removeUnit={removeUnit}
+                        <SyllabusInput onUnitChange={handleUnitChange}
+                            onRemoveUnit={removeUnit}
                             units={units} />
                     </div>
                 </div>
