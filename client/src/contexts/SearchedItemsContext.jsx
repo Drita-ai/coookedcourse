@@ -4,9 +4,6 @@ import axios from 'axios';
 
 const SearchedItemsContext = createContext();
 
-// JSON file server
-const BASE_URL = 'http://localhost:3000'
-
 function SearchedItemsProvider({ children }) {
     const [searchedItems, setSearchedItems] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -25,20 +22,7 @@ function SearchedItemsProvider({ children }) {
     }
         */
 
-    // FETCH Videos and Playlists
-    async function fetchVideosAndPlaylists() {
-        try {
-            setIsLoading(true);
-            const response = await axios.get(`${BASE_URL}/items`);
-            setSearchedItems(response.data)
-        } catch (err) {
-            console.log("There was an error loading the data..." + err)
-        } finally {
-            setIsLoading(false)
-        }
-    }
-
-    return <SearchedItemsContext.Provider value={{ searchedItems, isLoading, fetchVideosAndPlaylists }}>
+    return <SearchedItemsContext.Provider value={{ searchedItems, isLoading }}>
         {children}
     </SearchedItemsContext.Provider>
 }
