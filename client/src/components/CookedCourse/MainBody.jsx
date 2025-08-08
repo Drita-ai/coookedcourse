@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import SubjectInput from './InputsBox/SubjectInput';
 import SyllabusInput from './InputsBox/SyllabusInput';
 import Spinner from '../Spinner';
+import { useNavigate } from 'react-router-dom';
+import { generateCourse } from '../../services/generateCourse';
 
 // SVG Icon for the Trash Can
 const TrashIcon = ({ className }) => (
@@ -22,8 +24,11 @@ const PlusIcon = ({ className }) => (
 );
 
 function MainBody() {
+    const navigate = useNavigate();
+
     // State to hold the course subject
     const [subject, setSubject] = useState('');
+
     // State to show a confirmation message after generation
     const [isGenerated, setIsGenerated] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -31,6 +36,9 @@ function MainBody() {
     // State to hold the list of units. Each unit is an object with an id, name, and topics.
     // We start with one empty unit by default.
     const [units, setUnits] = useState([{ id: 1, name: '', topics: '' }]);
+
+    // Error
+    const [error, setError] = useState(null)
 
     const handleUnitChange = (id, event) => {
         const { name, value } = event.target;
@@ -51,27 +59,33 @@ function MainBody() {
         }
     };
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
+    // On submit -> Generate Course
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         setIsLoading(true);
+        setError(null);
 
+        // Extract Units and Syllabus
         const syllabus = units.map(unit => ({
+            id: unit.id,
             unit: unit.name,
-            topics: unit.topics.split(',').map(topic => topic.trim()).filter(Boolean)
+            topics: unit.topics
         }));
 
         const courseData = {
             subject,
-            syllabus
+            syllabus,
+            client: "0c458858-4cff-46ab-a8ec-5ae97c511668"
         };
-
-        console.log('Course Data Submitted:', JSON.stringify(courseData, null, 2));
-
-        setTimeout(() => {
+        console.log(courseData)
+        try {
+            const apiData = await generateCourse(courseData);
+            navigate('/display-cooked-course', { state: { course: apiData } });
+        } catch (err) {
+            setError(err.message);
+        } finally {
             setIsLoading(false);
-            setIsGenerated(true);
-            setTimeout(() => setIsGenerated(false), 4000);
-        }, 1500);
+        }
 
     };
 
