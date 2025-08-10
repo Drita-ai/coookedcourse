@@ -13,8 +13,6 @@ const apiClient = axios.create({
 export const generateCourse = async (courseData) => {
     try {
         const response = await apiClient.post('/generate-course', courseData);
-
-        console.log("Received successful response from backend:", response.data);
         return response.data;
     } catch (error) {
         if (error.response) {
