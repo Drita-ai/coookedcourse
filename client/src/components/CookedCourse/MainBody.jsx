@@ -72,15 +72,18 @@ function MainBody() {
             topics: unit.topics
         }));
 
+        // TODO: Get Client Properly 
         const courseData = {
             subject,
             syllabus,
             client: "0c458858-4cff-46ab-a8ec-5ae97c511668"
         };
-        console.log(courseData)
+
         try {
-            const apiData = await generateCourse(courseData);
-            navigate('/display-cooked-course', { state: { course: apiData } });
+            // TODO: Get Generated Playlist Id
+            setIsLoading(false)
+            // Then, navigate
+            navigate(`/display-cooked-course/0c458858-4cff-46ab-a8ec-5ae97c511668`, { state: { data: courseData } });
         } catch (err) {
             setError(err.message);
         } finally {
