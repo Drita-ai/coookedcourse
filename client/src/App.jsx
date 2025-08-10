@@ -13,7 +13,7 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route index element={<CookedCourse />} />
-            <Route path='/display-cooked-course' element={<DisplayCookedCourse />} />
+            <Route path='/display-cooked-course/:courseId' element={<DisplayCookedCourse />} />
             <Route path='*' element={<PageNotFound />} />
           </Routes>
         </BrowserRouter>
