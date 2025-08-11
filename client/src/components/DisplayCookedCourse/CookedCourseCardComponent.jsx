@@ -2,10 +2,16 @@ import { useRef } from 'react';
 import { useInView, motion } from 'framer-motion';
 import Card from './Card/Card'
 import { Clock, PlayCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 function CookedCourseCardComponent({ playlist }) {
     const ref = useRef(null);
     const isInView = useInView(ref, { once: true, amount: 0.5 });
+    const navigate = useNavigate();
+
+    function handleClick(playlistId) {
+        navigate(`/playlist-items/${playlistId}`);
+    }
 
     return (
         <motion.div
@@ -16,6 +22,7 @@ function CookedCourseCardComponent({ playlist }) {
             className="flex-shrink-0 h-[300px]"
         >
             <Card
+                onClick={() => handleClick(playlist.collegeName)}
                 className="h-full w-full bg-slate-900 border-slate-800 rounded-2xl overflow-hidden cursor-pointer group relative"
             >
                 <img
