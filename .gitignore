@@ -3,3 +3,4 @@ dev-data/
 node_modules
 __pycache__/
 venv/
+.vscode/
