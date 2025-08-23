@@ -23,8 +23,8 @@ async def generate_topics(syll: Syllabus):
             TODO: Here we'll have to implement passing of syllabus to constructor
                   for further processing using LLM 
         '''
-        
-        cookedTopics = CookedCourseAgent().mockExtractTopics()
+
+        cookedTopics = CookedCourseAgent(syll).extractTopics()
         return cookedTopics
     except Exception as e:
         print(e)
