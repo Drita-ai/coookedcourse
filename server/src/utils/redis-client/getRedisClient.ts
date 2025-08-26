@@ -7,7 +7,7 @@ export const getRedisClient = async (): Promise<RedisClientType> => {
     if (client) return client;
 
     if (!connecting) {
-        const tempClient: RedisClientType = createClient();
+        const tempClient: RedisClientType = createClient({ url: process.env.REDIS_URL });
 
         tempClient.on('error', (err) => console.error('Redis Client Error', err))
 
