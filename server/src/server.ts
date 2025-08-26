@@ -12,9 +12,10 @@ process.on("uncaughtException", (err) => {
     process.exit(1);
 });
 
-const PORT = process.env.PORT || 3300
+const PORT = Number(process.env.PORT) || 3300
+const HOST = '0.0.0.0'
 
-const server = app.listen(PORT, () => { console.log(`listening on port ${PORT}`) })
+const server = app.listen(PORT, HOST, () => { console.log(`listening on port ${PORT}`) })
 
 process.on("unhandledRejection", (err: Error) => {
     console.log(err.name, err.message);
