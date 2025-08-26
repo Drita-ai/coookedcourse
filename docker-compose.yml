@@ -1,0 +1,60 @@
+version: '2.2'
+services:
+  redis:
+    image: redis
+    container_name: redis
+    ports: 
+      - 6380:6379
+    networks:
+      - cookedcourse_network
+
+  postgres:
+    image: postgres
+    container_name: postgres
+    ports:
+      - 5431:5432
+    networks:
+      - cookedcourse_network
+
+  server:
+    image: cookedcourse-server
+    container_name: server_container
+    depends_on:
+      - redis
+      - postgres
+    ports: 
+      - 3300:3300
+    networks:
+      - cookedcourse_network
+    env_file:
+      - ./server/.env
+    volumes:
+      - ./server:/app/server
+
+  client:
+    image: cookedcourse-client
+    container_name: client_container
+    ports: 
+      - 5173:5173
+    networks:
+      - cookedcourse_network
+    volumes:
+      - ./client:/app/client
+
+  agent:
+    image: cookedcourse-agent
+    container_name: agent_container
+    ports: 
+      - 8000:8000 
+    networks:
+      - cookedcourse_network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file:
+      - ./agent/.env
+    volumes:
+      - ./agent:/app/agent
+      - ./dev-data:/app/dev-data
+  
+networks:
+  cookedcourse_network:
