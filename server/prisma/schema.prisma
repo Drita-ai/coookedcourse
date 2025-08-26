@@ -11,5 +11,32 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgres://postgres:my_secure_password@localhost:5432/cookedcourse"
+  url      = "postgres://postgres:my_secure_password@prisma:5432/cookedcourse"
+}
+
+model User {
+  id       String @id @default(cuid())
+  clientId String @unique
+}
+
+model Syllabus {
+  id       String @id @default(cuid())
+  syllabus String
+  unitId   String @unique
+  unit     Unit   @relation(fields: [unitId], references: [id])
+}
+
+model Unit {
+  id String @id @default(cuid())
+
+  syllabus Syllabus?
+  chapter  Chapter[]
+}
+
+model Chapter {
+  id     String   @id @default(cuid())
+  name   String
+  topics String[]
+  unitId String
+  unit   Unit     @relation(fields: [unitId], references: [id])
 }
