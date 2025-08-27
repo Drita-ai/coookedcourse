@@ -16,4 +16,4 @@ COPY . .
 
 EXPOSE 3300
 
-CMD ["npm", "run", "start:dev"]
+CMD ["sh", "-c", "npx ts-node src/seed.ts --import && npm run start:dev"]
