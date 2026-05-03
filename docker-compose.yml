@@ -21,7 +21,10 @@ services:
       - POSTGRES_DB=cookedcourse 
 
   server:
-    image: cookedcourse-server
+    # image: cookedcourse-server
+    build:
+      context: ./server
+      dockerfile: Dockerfile
     container_name: server_container
     depends_on:
       - redis
@@ -36,7 +39,10 @@ services:
       - ./server:/app/server
 
   client:
-    image: cookedcourse-client
+    # image: cookedcourse-client
+    build:
+      context: ./client
+      dockerfile: Dockerfile
     container_name: client_container
     ports: 
       - 5173:5173
@@ -46,7 +52,10 @@ services:
       - ./client:/app/client
 
   agent:
-    image: cookedcourse-agent
+    # image: cookedcourse-agent
+    build:
+      context: ./agent
+      dockerfile: Dockerfile
     container_name: agent_container
     ports: 
       - 8000:8000 
