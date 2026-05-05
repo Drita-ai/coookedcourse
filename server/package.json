@@ -8,7 +8,8 @@
   "main": "app.js",
   "scripts": {
     "start:dev": "nodemon",
-    "start:prod": "NODE_ENV=production nodemon"
+    "start:prod": "NODE_ENV=production nodemon",
+    "build": "tsc"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.9",
