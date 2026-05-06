@@ -7,7 +7,10 @@ const router = express.Router();
 
 router
     .route('/generate-course')
-    .post(authController.protect, generateCourseController.checkInDB, generateCourseController.generateCourse)
-
+    .post(
+        authController.protect,
+        generateCourseController.checkInDB,
+        generateCourseController.generateCourse
+    )
 
 export { router }

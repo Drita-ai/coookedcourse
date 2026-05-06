@@ -1,4 +1,5 @@
 import React from 'react'
+import { FaTrash } from "react-icons/fa";
 
 function SyllabusInput({ units, onRemoveUnit, onUnitChange }) {
 
@@ -16,7 +17,7 @@ function SyllabusInput({ units, onRemoveUnit, onUnitChange }) {
                                 className="text-neutral-500 hover:text-red-500 transition-colors duration-200"
                                 aria-label="Remove Unit"
                             >
-                                <TrashIcon className="w-5 h-5" />
+                                <FaTrash className="w-5 h-5" />
                             </button>
                         )}
                     </div>
