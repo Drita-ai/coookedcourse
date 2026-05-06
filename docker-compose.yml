@@ -31,12 +31,14 @@ services:
       - postgres
     ports: 
       - 3300:3300
+      - 9229:9229
     networks:
       - cookedcourse_network
     env_file:
       - ./server/.env
     volumes:
       - ./server:/app/server
+      - /app/server/node_modules
 
   client:
     # image: cookedcourse-client
