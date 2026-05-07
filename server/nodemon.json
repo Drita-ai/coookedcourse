@@ -3,5 +3,5 @@
         "src"
     ],
     "ext": "ts,json",
-    "exec": "ts-node --files ./src/server.ts"
+    "exec": "tsx --inspect=0.0.0.0:9229 ./src/server.ts"
 }
