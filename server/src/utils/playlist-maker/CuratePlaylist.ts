@@ -62,6 +62,7 @@ export class CuratePlaylist {
 
         // Prior to making Request, Check curated items in cache
         if (!(await redisClient.get(`${CK_CHANNELS_WITH_VIDEOS_TITLES}#${clientToken}`))) {
+            console.log("Storing api result in cache")
             // Fetch all the Videos List
             const vidoesItems = (await fetchAllVideosWithRetry(playlistVideoURLS));
 
@@ -70,7 +71,6 @@ export class CuratePlaylist {
 
             channelsListWithTopics = vla.extractVideosTopics()!;
             await redisClient.set(`${CK_CHANNELS_WITH_VIDEOS_TITLES}#${clientToken}`, JSON.stringify(channelsListWithTopics))
-            console.log("inside")
             await redisClient.set(`${CK_CHANNELS_WITH_VIDEOS_DETAILS}#${clientToken}`, JSON.stringify(vla.extractVideosDetails()))
         }
 

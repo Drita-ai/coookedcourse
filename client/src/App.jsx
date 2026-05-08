@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import { SearchedItemsProvider } from './contexts/SearchedItemsContext.jsx'
 
+import Home from './pages/Home.jsx'
 import CookedCourse from './pages/CookedCourse'
 import DisplayCookedCourse from './pages/DisplayCookedCourse.jsx'
 import PageNotFound from './pages/PageNotFound.jsx'
@@ -13,7 +14,8 @@ function App() {
       <SearchedItemsProvider>
         <BrowserRouter>
           <Routes>
-            <Route index element={<CookedCourse />} />
+            <Route index element={<Home />} />
+            <Route path='/app' element={<CookedCourse />} />
             <Route path='/display-cooked-course/:courseId' element={<DisplayCookedCourse />} />
             <Route path='/playlist-items/:curatedPlaylistId' element={<CookedPlaylist />} />
             <Route path='*' element={<PageNotFound />} />
