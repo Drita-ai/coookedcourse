@@ -93,7 +93,7 @@ function MainBody() {
     };
 
     return (
-        <div className="bg-violet-200 backdrop-blur-xl border border-neutral-300 rounded-2xl p-6 md:p-8 shadow-2xl shadow-purple-900/10">
+        <div className="bg-slate-900 border border-slate-700/60 rounded-2xl p-6 md:p-8 shadow-2xl shadow-black/30">
             <form onSubmit={handleSubmit}>
                 {/* Subject Input Box */}
                 <SubjectInput subject={subject} onSetSubject={setSubject} />
@@ -111,9 +111,9 @@ function MainBody() {
                     <button
                         type="button"
                         onClick={addUnit}
-                        className="group flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-slate-500 hover:text-slate-600 transition-all"
+                        className="group flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-widest text-slate-400 hover:text-slate-200 transition-colors duration-200"
                     >
-                        <span className="flex items-center justify-center w-6 h-6 rounded-full border-2 border-slate-100 group-hover:border-slate-400 transition-colors">
+                        <span className="flex items-center justify-center w-6 h-6 rounded-full border border-slate-600 group-hover:border-slate-400 group-hover:bg-slate-700/50 transition-all duration-200">
                             <PlusIcon className="w-3 h-3" />
                         </span>
                         Add another unit
@@ -122,9 +122,19 @@ function MainBody() {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full sm:w-auto bg-slate-600 hover:bg-slate-700 hover:cursor-pointer text-white px-12 py-4 rounded-xl text-xs font-bold uppercase tracking-[0.2em] shadow-xl shadow-indigo-100 transition-all active:scale-95 disabled:opacity-30"
+                        className="
+                            relative w-full sm:w-auto
+                            bg-white hover:bg-gray-200
+                            disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed
+                            text-slate-900 px-12 py-4 rounded-xl
+                            text-xs font-bold uppercase tracking-[0.2em]
+                            shadow-lg shadow-slate-700/40
+                            transition-all duration-200
+                            active:scale-95
+                            cursor-pointer
+                        "
                     >
-                        {isLoading ? 'Processing' : 'Generate Course'}
+                        Generate Course
                     </button>
                 </div>
 
@@ -137,7 +147,7 @@ function MainBody() {
                 )} */}
             </form>
         </div>
-    )
+    );
 }
 
 export default MainBody

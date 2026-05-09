@@ -30,7 +30,7 @@ function SyllabusInput({ units, onRemoveUnit, onUnitChange }) {
                                 onChange={(e) => onUnitChange(unit.id, e)}
                                 placeholder="Unit Name"
                                 required
-                                className="w-full bg-transparent text-sm font-medium text-slate-600 placeholder:text-slate-400 outline-none"
+                                className="w-full bg-transparent text-sm font-medium text-slate-200 placeholder:text-slate-400 outline-none"
                             />
                             <div className="h-[2px] w-full bg-slate-200  group-focus-within:bg-slate-500 transition-all duration-500" />
                         </div>
@@ -42,7 +42,7 @@ function SyllabusInput({ units, onRemoveUnit, onUnitChange }) {
                                 onChange={(e) => onUnitChange(unit.id, e)}
                                 placeholder="Key topics (comma separated)"
                                 required
-                                className="w-full bg-transparent text-sm font-medium text-slate-600 placeholder:text-slate-400 outline-none"
+                                className="w-full bg-transparent text-sm font-medium text-slate-200 placeholder:text-slate-400 outline-none"
                             />
                             <div className="h-[2px] w-full bg-slate-200 scale-x-100 group-focus-within:bg-slate-500 transition-all duration-500" />
                         </div>

@@ -10,7 +10,7 @@ function SubjectInput({ subject, onSetSubject }) {
                 onChange={(e) => onSetSubject(e.target.value)}
                 placeholder="e.g. Data Structure and Algorithm"
                 required
-                className="w-full bg-slate-50/50 border border-transparent rounded-2xl py-3 px-8 text-lg font-light text-slate-500 placeholder:text-slate-400 focus:bg-white focus:border-blue-100 focus:ring-4 focus:ring-blue-50/50 outline-none transition-all duration-300"
+                className="w-full bg-slate-200 border border-transparent rounded-2xl py-3 px-8 text-lg font-light text-slate-500 placeholder:text-slate-400 focus:bg-white focus:border-blue-100 focus:ring-4 focus:ring-blue-50/50 outline-none transition-all duration-300"
             />
         </div>
     );
