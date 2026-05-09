@@ -1,23 +1,19 @@
-import React from 'react'
-
 function SubjectInput({ subject, onSetSubject }) {
     return (
-        <div className="mb-6">
-            <label htmlFor="subject" className="block text-lg font-medium text-neutral-300 mb-2">
-                Course Subject
+        <div className="mb-8">
+            <label className="block text-[12px] font-bold uppercase tracking-[0.2em] text-slate-600 mb-2 ml-1">
+                Course Name
             </label>
             <input
                 type="text"
-                id="subject"
-                name="subject"
                 value={subject}
                 onChange={(e) => onSetSubject(e.target.value)}
-                placeholder="e.g., Quantum Physics"
+                placeholder="e.g. Data Structure and Algorithm"
                 required
-                className="w-full bg-neutral-900 border border-neutral-700 rounded-lg py-3 px-4 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all duration-300"
+                className="w-full bg-slate-50/50 border border-transparent rounded-2xl py-3 px-8 text-lg font-light text-slate-500 placeholder:text-slate-400 focus:bg-white focus:border-blue-100 focus:ring-4 focus:ring-blue-50/50 outline-none transition-all duration-300"
             />
         </div>
-    )
+    );
 }
 
 export default SubjectInput

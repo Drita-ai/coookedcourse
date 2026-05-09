@@ -93,14 +93,13 @@ function MainBody() {
     };
 
     return (
-        <div className="bg-neutral-950/60 backdrop-blur-xl border border-neutral-800 rounded-2xl p-6 md:p-8 shadow-2xl shadow-purple-900/10">
+        <div className="bg-violet-200 backdrop-blur-xl border border-neutral-300 rounded-2xl p-6 md:p-8 shadow-2xl shadow-purple-900/10">
             <form onSubmit={handleSubmit}>
                 {/* Subject Input Box */}
                 <SubjectInput subject={subject} onSetSubject={setSubject} />
 
                 {/* Unit Input Box */}
                 <div className="mb-4">
-                    <h2 className="text-lg font-medium text-neutral-300 mb-3">Syllabus Units</h2>
                     <div className="space-y-4">
                         <SyllabusInput onUnitChange={handleUnitChange}
                             onRemoveUnit={removeUnit}
@@ -108,21 +107,24 @@ function MainBody() {
                     </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-center gap-4 mt-6">
+                <div className="mt-16 flex flex-col sm:flex-row items-center justify-between gap-6">
                     <button
                         type="button"
                         onClick={addUnit}
-                        className="w-full sm:w-auto flex items-center justify-center gap-2 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 font-semibold py-2 px-4 rounded-lg transition-all duration-300"
+                        className="group flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-slate-500 hover:text-slate-600 transition-all"
                     >
-                        <PlusIcon className="w-5 h-5" />
-                        Add Unit
+                        <span className="flex items-center justify-center w-6 h-6 rounded-full border-2 border-slate-100 group-hover:border-slate-400 transition-colors">
+                            <PlusIcon className="w-3 h-3" />
+                        </span>
+                        Add another unit
                     </button>
+
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full sm:w-auto flex-grow bg-gradient-to-r from-teal-600 to-blue-900 cursor-pointer text-white font-bold py-3 px-6 rounded-lg shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full sm:w-auto bg-slate-600 hover:bg-slate-700 hover:cursor-pointer text-white px-12 py-4 rounded-xl text-xs font-bold uppercase tracking-[0.2em] shadow-xl shadow-indigo-100 transition-all active:scale-95 disabled:opacity-30"
                     >
-                        {isLoading ? 'Generating...' : 'Generate Course'}
+                        {isLoading ? 'Processing' : 'Generate Course'}
                     </button>
                 </div>
 
