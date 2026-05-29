@@ -11,16 +11,21 @@ export class CuratePlaylist {
     private topics: CookedTopics;
     private subject: string;
     private SEARCH_PLAYLIST_URL: string;
+    private MAX_PLAYLIST_TO_FETCH: string;
     public extractedTopics?: string[];
 
     constructor(topics: CookedTopics, subject: string) {
         this.topics = topics
         this.subject = subject
         this.SEARCH_PLAYLIST_URL = this.makePlaylistURL()
+        this.MAX_PLAYLIST_TO_FETCH = '5'
     }
 
     private makePlaylistURL(): string {
-        return process.env.SEARCH_PLAYLIST_URL!.replace('[SUBJECT]', this.subject).replace('[YOUR_API_KEY]', process.env.YOUTUBE_API!)
+        return process.env.SEARCH_PLAYLIST_URL!
+            .replace('[MAX_PLAYLIST_TO_FETCH', this.MAX_PLAYLIST_TO_FETCH)
+            .replace('[SUBJECT]', this.subject)
+            .replace('[YOUR_API_KEY]', process.env.YOUTUBE_API!)
     }
 
     private makeVideosOfPlaylistURL(playlistId: string): string {
