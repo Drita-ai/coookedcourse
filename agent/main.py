@@ -1,11 +1,20 @@
+from pathlib import Path
 import json
+import re
+import time
+
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel 
-from pathlib import Path
+from langchain.prompts.prompt import PromptTemplate
+from langchain.chat_models import init_chat_model
 
 from cookedcourseagent.CookedCourseAgent import CookedCourseAgent
+from prompts import SYLLABUS_ANALYSIS_PROMPT
 
+
+# Max Playlists to Consider 
+MAX_PLAYLISTS_TO_ITERATE = 1
 
 app = FastAPI()
 
@@ -33,64 +42,53 @@ async def generate_topics(syll: Syllabus):
 @app.post("/api/v1/agent/analyze-topics/")
 async def analyze_topics(payload: YTAndSyllabusTopics):
     try:
-        # Construct a path to the JSON file relative to the script's location.
-        current_file_path = Path(__file__)
-        project_root = current_file_path.parent.parent
-        file_path = project_root / "dev-data" / "analyzed-topics.json"
-
-        if not file_path.exists():
-            raise HTTPException(
-                status_code=404,
-                detail=f"File not found at the expected path: {file_path}"
-            )
-
-        with open(file_path, "r", encoding="utf-8") as f:
-            analyzed_data = json.load(f)
+        syllabus_topics = payload.syllabus_topics
+        channel_topics = payload.channel_topics
         
-        if not isinstance(analyzed_data, dict):
-            raise HTTPException(
-                status_code=500,
-                detail="Invalid data format: root of analyzed-topics.json should be a dictionary."
-            )
-
-        # --- FIX: Store and re-add "unmatchedYoutubeTopics" to each item ---
-
-        # Pop the general unmatched topics to store them separately.
-        unmatched_topics = analyzed_data.pop("unmatchedYoutubeTopics", {})
-        
-        # Find the first channel key in the file to use as the template key
-        # (e.g., "Gate Smashers")
-        template_key = next((key for key in analyzed_data), None)
-
-        if not template_key:
-            raise HTTPException(
-                status_code=500,
-                detail="Invalid data format: No channel data found in the JSON file to use as a template."
-            )
-            
-        # This is the data that will be reused for every channel in the payload
-        template_data = analyzed_data[template_key]
-        
-        payload_channel_names = list(payload.channel_topics.keys())
-        new_response_data = []
-        
-        # Iterate through the channel names from the payload
-        for new_channel_name in payload_channel_names:
-            # Create a new dictionary for each channel using the template data
-            # and add the unmatched topics back in.
-            new_item = {
-                new_channel_name: template_data,
-                "unmatchedYoutubeTopics": unmatched_topics
-            }
-            new_response_data.append(new_item)
-
-        return new_response_data
-
-    except json.JSONDecodeError:
-        raise HTTPException(
-            status_code=500,
-            detail="Failed to decode JSON from the file. Please check the file format."
+        llm = init_chat_model(
+            "llama-3.3-70b-versatile",
+            model_provider="groq",
         )
+        
+        combined_syllabus = []
+        
+        # Iterate over syllabus topics
+        for _, syllabus_topic  in syllabus_topics.items():
+            for topic in syllabus_topic:
+                combined_syllabus.append({
+                    "name": topic['name'],
+                    "topics": topic['topics']
+                })
+        
+        aggregated_llm_res = []
+        
+        # Iterate over Playlists
+        for channel_name, video_titles in list(channel_topics.items())[:MAX_PLAYLISTS_TO_ITERATE]:
+            course_topics_prompt_template = PromptTemplate(
+                input_variables=["syllabus_units", "playlist_video_titles"], 
+                template=SYLLABUS_ANALYSIS_PROMPT
+            )
+        
+            chain = course_topics_prompt_template | llm
+        
+            res = chain.invoke(
+                input={
+                    "syllabus_units": combined_syllabus, 
+                    "playlist_video_titles": video_titles
+                })
+
+            text_output = res.content if hasattr(res, "content") else str(res)
+
+            clean_text = re.sub(r"```json|```", "", text_output).strip()
+            
+            aggregated_llm_res.append({
+                "channelName": channel_name,
+                "analyzedPlaylistData": json.loads(clean_text)
+            })
+            
+            time.sleep(3)
+        
+        return aggregated_llm_res
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
         raise HTTPException(

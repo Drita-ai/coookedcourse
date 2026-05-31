@@ -58,29 +58,3 @@ class ExtractTopics:
             return json.loads(clean_text)  
         except json.JSONDecodeError:
             raise ValueError("LLM did not return valid JSON:\n" + clean_text)
-
-class MockExtractTopics:
-    """
-    This class provides a mock implementation for topic extraction, fetching data from predefined URLs.
-    """
-    _SOURCE_URLS = ["http://host.docker.internal:3000/Unit 1", 
-                   "http://host.docker.internal:3000/Unit 2",
-                   "http://host.docker.internal:3000/Unit 3",
-                   "http://host.docker.internal:3000/Unit 4",
-                   "http://host.docker.internal:3000/Unit 5"]
-    
-    def mockExtractTopics(self):
-        """
-        Fetches mock topic data from a list of source URLs.
-        """
-        mockTopicsResult = {}
-        
-        for i, url in enumerate(self._SOURCE_URLS):
-            try:
-                res = requests.get(url)
-                res.raise_for_status() 
-                mockTopicsResult[f'Unit {i + 1}'] = res.json()
-            except requests.exceptions.RequestException as e:
-                print(f"Error fetching mock data from {url}: {e}")
-        
-        return mockTopicsResult
