@@ -1,9 +1,9 @@
 from langchain.chat_models import init_chat_model
 from dotenv import load_dotenv
 
-from .ExtractTopics import ExtractTopics, MockExtractTopics
+from .ExtractTopics import ExtractTopics
 
-class CookedCourseAgent(ExtractTopics, MockExtractTopics):
+class CookedCourseAgent(ExtractTopics):
     """
     An agent that can extract course topics from a syllabus using an LLM.
     """

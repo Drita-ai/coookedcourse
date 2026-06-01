@@ -24,6 +24,17 @@ class Syllabus(BaseModel):
 class YTAndSyllabusTopics(BaseModel):
     syllabus_topics: dict
     channel_topics: dict
+
+class SyllabusAnalysis(BaseModel):
+    unit_coverage_percentage: int
+    unit_name: str
+    matched_videos_titles: list[str]
+    matched_topics: list[str]
+    unmatched_topics: list[str]
+
+class AnalysisResponse(BaseModel):
+    overall_syllabus_coverage_percentage: int
+    sylabus_analysis: list[SyllabusAnalysis]
     
 @app.post("/api/v1/agent/generate-topics/")
 async def generate_topics(syll: Syllabus):
@@ -50,6 +61,8 @@ async def analyze_topics(payload: YTAndSyllabusTopics):
             model_provider="groq",
         )
         
+        structured_llm = llm.with_structured_output(AnalysisResponse)
+        
         combined_syllabus = []
         
         # Iterate over syllabus topics
@@ -69,21 +82,17 @@ async def analyze_topics(payload: YTAndSyllabusTopics):
                 template=SYLLABUS_ANALYSIS_PROMPT
             )
         
-            chain = course_topics_prompt_template | llm
+            chain = course_topics_prompt_template | structured_llm
         
             res = chain.invoke(
                 input={
                     "syllabus_units": combined_syllabus, 
                     "playlist_video_titles": video_titles
                 })
-
-            text_output = res.content if hasattr(res, "content") else str(res)
-
-            clean_text = re.sub(r"```json|```", "", text_output).strip()
             
             aggregated_llm_res.append({
                 "channelName": channel_name,
-                "analyzedPlaylistData": json.loads(clean_text)
+                "analyzedPlaylistData": res.model_dump()
             })
             
             time.sleep(3)
