@@ -28,9 +28,32 @@ model Unit {
 }
 
 model Chapter {
-  id     String   @id @default(cuid())
-  name   String
-  topics String[]
-  unitId String
-  unit   Unit     @relation(fields: [unitId], references: [id])
+  id              String            @id @default(cuid())
+  name            String
+  topics          String[]
+  unitId          String
+  unit            Unit              @relation(fields: [unitId], references: [id])
+  chapterAnalysis ChapterAnalysis[]
+}
+
+model ChapterAnalysis {
+  id                      String   @id @default(cuid())
+  channelName             String   @default("")
+  matchedSyllabusTopics   String[] @default([])
+  unmatchedSyllabusTopics String[] @default([])
+  unitCoveragePercentage  Float
+
+  chapterId String
+  chapter   Chapter @relation(fields: [chapterId], references: [id])
+
+  matchedYoutubeTitles MatchedYoutubeTitle[]
+}
+
+model MatchedYoutubeTitle {
+  id           String @id @default(cuid())
+  ytVideoTitle String
+  ytVideoId    String
+
+  chapterAnalysisId String
+  chapterAnalysis   ChapterAnalysis @relation(fields: [chapterAnalysisId], references: [id])
 }
