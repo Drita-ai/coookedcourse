@@ -39,9 +39,6 @@ export class APIFeature {
         this.data = JSON.parse(JSON.stringify(transformedData.filter(Boolean)));
     }
 
-    /**
-     * Calculates and adds aggregate fields. This method should now work correctly.
-     */
     public calculateFields(): this {
         this.data.forEach(college => {
             let totalMatchedTopics = 0;

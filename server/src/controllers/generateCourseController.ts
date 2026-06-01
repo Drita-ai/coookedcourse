@@ -29,7 +29,17 @@ const generateCourse = catchAsync(async (req: Request, res: Response, next: Next
     // Get all extracted Units from reference ids
     const storedUnitData = await prisma.unit.findMany({
         where: { id: { in: req.__cc_reference_ids } },
-        select: { chapter: true }
+        include: {
+            chapter: {
+                include: {
+                    chapterAnalysis: {
+                        include: {
+                            matchedYoutubeTitles: true
+                        }
+                    }
+                }
+            }
+        }
     })
 
     let initialUnitCount = 0;
@@ -48,12 +58,60 @@ const generateCourse = catchAsync(async (req: Request, res: Response, next: Next
         return acc;
     }, extractedTopics as Record<string, any>)
 
+    // Retrieve 'Chapters' data from DB and turn it into flat array
+    const chaptersData = storedUnitData.flatMap((unitData) => unitData.chapter.map(el => el)) as any;
 
     // 2) Playlist Maker Instance
-    const pm = new PlaylistMaker(extractedTopics, subject);
-    const searchedPlaylists = await pm.fetchPlaylistVideos(req._cooked_client, req.query)
+    if (Object.keys(req.__cc_final_syllabus!).length !== 0) {
+        const pm = new PlaylistMaker(extractedTopics, subject);
+        const { analyzedTopicsToSave } = await pm.fetchPlaylistVideos(req._cooked_client, req.query, chaptersData);
 
-    res.status(200).json({ "message": "success", data: searchedPlaylists })
+        const insertPromises = analyzedTopicsToSave.map(analyzedTopic => prisma.chapterAnalysis.create({ data: analyzedTopic }))
+        await prisma.$transaction(insertPromises);
+    }
+
+    // Flat array of all chapters from DB
+    const allChapters = storedUnitData.flatMap(unit => unit.chapter);
+
+    // These are used for navigation, for now
+    const navChapters = allChapters.map(ch => ({
+        id: ch.id,
+        name: ch.name
+    }));
+
+    // Set to add only unique channels
+    const uniqueChannels = new Set();
+    const analysisMap = {};
+
+    allChapters.forEach(chapter => {
+        chapter.chapterAnalysis.forEach(analysis => {
+            const channelName = analysis.channelName;
+            uniqueChannels.add(channelName);
+
+            // channel key
+            if (!analysisMap[channelName]) {
+                analysisMap[channelName] = {};
+            }
+
+            // Map data directly to the specific chapter ID
+            analysisMap[channelName][chapter.id] = {
+                analysisId: analysis.id,
+                unitCoveragePercentage: analysis.unitCoveragePercentage,
+                matchedSyllabusTopics: analysis.matchedSyllabusTopics,
+                unmatchedSyllabusTopics: analysis.unmatchedSyllabusTopics,
+                videos: analysis.matchedYoutubeTitles.map(vid => ({
+                    ytVideoTitle: vid.ytVideoTitle,
+                    ytVideoId: vid.ytVideoId
+                }))
+            };
+        });
+    });
+    res.status(200).json({
+        "message": "success",
+        navChapters,
+        channels: Array.from(uniqueChannels),
+        analysisMap
+    })
 })
 
 const checkInDB = catchAsync(async (req: Request, res: Response, next: NextFunction) => {

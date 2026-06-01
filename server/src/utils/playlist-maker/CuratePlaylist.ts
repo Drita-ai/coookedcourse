@@ -11,19 +11,19 @@ export class CuratePlaylist {
     private topics: CookedTopics;
     private subject: string;
     private SEARCH_PLAYLIST_URL: string;
-    private MAX_PLAYLIST_TO_FETCH: string;
+    private MAX_PLAYLISTS_TO_FETCH: string;
     public extractedTopics?: string[];
 
     constructor(topics: CookedTopics, subject: string) {
         this.topics = topics
         this.subject = subject
         this.SEARCH_PLAYLIST_URL = this.makePlaylistURL()
-        this.MAX_PLAYLIST_TO_FETCH = '5'
+        this.MAX_PLAYLISTS_TO_FETCH = '3'
     }
 
     private makePlaylistURL(): string {
         return process.env.SEARCH_PLAYLIST_URL!
-            .replace('[MAX_PLAYLIST_TO_FETCH', this.MAX_PLAYLIST_TO_FETCH)
+            .replace('[MAX_PLAYLISTS_TO_FETCH]', '3')
             .replace('[SUBJECT]', this.subject)
             .replace('[YOUR_API_KEY]', process.env.YOUTUBE_API!)
     }
@@ -49,7 +49,7 @@ export class CuratePlaylist {
     /**
      * Funtion to return all videos of related PLAYLIST 
      */
-    async fetchPlaylistVideos(clientToken: string = '', query: QueryString) {
+    async fetchPlaylistVideos(clientToken: string = '', query: QueryString, chaptersData) {
         // Fetch Playlists
         const fetchedPlaylists = await this.fetchPlaylists(clientToken)
 
@@ -84,11 +84,56 @@ export class CuratePlaylist {
         // TODO: Will SEND accordingly
         const channelListWithVideoDetails = JSON.parse((await redisClient.get(`${CK_CHANNELS_WITH_VIDEOS_DETAILS}#${clientToken}`))!);
 
-        // GET Analyzed topics 
-        const analyzedTopics = (await vla!.topicComparison(channelsListWithTopics!, this.topics))!;
+        let analyzedTopics;
 
-        const finalAnalyzedTopics = new APIFeature(analyzedTopics as unknown as CollegeAnalysis[], query).calculateFields().filter().sort().limitFields().paginate();
+        if (!(await redisClient.get('analyzed-topics-llm-response'))) {
+            // GET Analyzed topics 
+            await redisClient.set('analyzed-topics-llm-response', JSON.stringify((await vla!.topicComparison(channelsListWithTopics!, this.topics))! as any));
+        }
 
-        return finalAnalyzedTopics.data
+        analyzedTopics = JSON.parse(await redisClient.get('analyzed-topics-llm-response') || '')
+
+        // Store matchedVideoTitles with their videoId(s)
+        const analyzedTopicsToSave = analyzedTopics.flatMap((analyzedTopic) => {
+            // Channel details that is to be processed
+            const channel = channelListWithVideoDetails.find(
+                (c) => c.channelName === analyzedTopic.channelName
+            );
+
+            return analyzedTopic.analyzedPlaylistData.sylabus_analysis.map(analysis => {
+                // Find chapter data
+                const chapterData = chaptersData.find(
+                    c => c.name === analysis.unit_name
+                )
+
+                // Map the matched video titles to their respective YT IDs
+                const matchedVideos = channel
+                    ? channel.items
+                        .filter((video) => analysis.matched_videos_titles.includes(video.title))
+                        .map((video) => ({
+                            ytVideoTitle: video.title,
+                            ytVideoId: video.videoId,
+                        }))
+                    : [];
+
+                return {
+                    channelName: analyzedTopic.channelName,
+                    matchedSyllabusTopics: analysis.matched_videos_titles,
+                    unmatchedSyllabusTopics: analysis.unmatched_topics,
+                    unitCoveragePercentage: analysis.unit_coverage_percentage,
+                    chapterId: chapterData.id,
+                    matchedYoutubeTitles: {
+                        create: matchedVideos
+                    }
+                }
+            }
+            )
+        })
+
+        // const finalAnalyzedTopics = new APIFeature(analyzedTopics as unknown as CollegeAnalysis[], query).calculateFields().filter().sort().limitFields().paginate();
+
+        return {
+            analyzedTopicsToSave
+        }
     }
 }
