@@ -1,41 +1,34 @@
 import { useState, useEffect } from "react";
-
-import { generateCourse } from '../services/generateCourse';
-import { normalizePlaylists } from '../services/utils';
+import { useLocation } from 'react-router-dom';
 
 import VideoInsight from '../components/CookedPlaylist/VideoInsight';
 import PlaylistsViewerSidebar from '../components/CookedPlaylist/PlylistsViewerSidebar';
 import PlaylistViewerHeader from '../components/CookedPlaylist/PlaylistViewerHeader';
+import { generateCourse } from '../services/generateCourse';
 
 export default function DisplayCookedCourse() {
-    const [playlists, setPlaylists] = useState([]);
+    const [navChapters, setNavChapters] = useState([]);
+    const [channels, setChannels] = useState([]);
+    const [analysisMap, setAnalysisMap] = useState({});
     const [status, setStatus] = useState("loading");
-    const [activePlaylist, setActivePlaylist] = useState(0);
-    const [activeSelection, setActiveSelection] = useState({
-        unitIndex: 0,
-        topicIndex: 0,
-    });
+    const [activePlaylistIndex, setActivePlaylistIndex] = useState(0);
+    const [activeChapterIndex, setActiveChapterIndex] = useState(0);
     const [selectedVideo, setSelectedVideo] = useState(null);
+
+    const courseDataToPost = useLocation().state;
 
     useEffect(() => {
         async function fetchPlaylists() {
             try {
                 setStatus("loading");
 
-                const courseData = {
-                    subject: {},
-                    syllabus: [],
-                    client: "0c458858-4cff-46ab-a8ec-5ae97c511668",
-                };
+                const res = await generateCourse(courseDataToPost.data);
+                const responseData = res.data ? res.data : res;
 
-                const res = await generateCourse(courseData);
-                console.log(res.data)
-                if (res.message === "success") {
-                    const normalizedData = normalizePlaylists(
-                        res.data
-                    );
-
-                    setPlaylists(normalizedData);
+                if (responseData.message === "success") {
+                    setNavChapters(responseData.navChapters || []);
+                    setChannels(responseData.channels || []);
+                    setAnalysisMap(responseData.analysisMap || {});
                     setStatus("success");
                 } else {
                     setStatus("error");
@@ -49,41 +42,62 @@ export default function DisplayCookedCourse() {
         fetchPlaylists();
     }, []);
 
-    const currentPlaylist =
-        playlists[activePlaylist];
+    const currentChannel = channels[activePlaylistIndex] || "";
+    const currentChapter = navChapters[activeChapterIndex] || null;
 
-    const currentUnit =
-        currentPlaylist?.units?.[
-        activeSelection.unitIndex
-        ];
+    // Extract data node matching current selection
+    const currentAnalysis = (currentChannel && currentChapter)
+        ? analysisMap[currentChannel]?.[currentChapter.id]
+        : null;
 
-    const currentTopic =
-        currentUnit?.topics?.[
-        activeSelection.topicIndex
-        ];
+    const rawVideos = currentAnalysis?.videos || [];
 
-    const videos =
-        currentTopic?.matchedVideos || [];
+    // Data expected by VideoInsight
+    const videos = rawVideos.map((video) => ({
+        id: video.ytVideoId,
+        title: video.ytVideoTitle,
+        insight: `This video directly addresses core items under ${currentChapter?.name}. Covered topics: ${(currentAnalysis?.matchedSyllabusTopics || []).slice(0, 2).join(', ')}.`,
+        coveragePct: currentAnalysis?.unitCoveragePercentage || 0,
+        duration: "10 mins",
+        timestamps: [
+            { t: "0:00", label: "Topic Introduction" },
+            { t: "4:30", label: "Core Core Concept & Example Walkthrough" }
+        ]
+    }));
 
-    function handlePlaylistSelect(index) {
-        setActivePlaylist(index);
-        setActiveSelection({
-            unitIndex: 0,
-            topicIndex: 0,
+    const adaptedPlaylists = channels.map((channel) => {
+        let cumulativeCoverage = 0;
+        navChapters.forEach((ch) => {
+            cumulativeCoverage += analysisMap[channel]?.[ch.id]?.unitCoveragePercentage || 0;
         });
 
+        return {
+            collegeName: channel,
+            overallCoverage: navChapters.length ? Math.round(cumulativeCoverage / navChapters.length) : 0
+        };
+    });
+
+    const adaptedCurrentPlaylist = {
+        units: navChapters.map((chapter) => ({
+            id: chapter.id,
+            unitName: chapter.name,
+            topics: [{ id: chapter.id, topicName: `${chapter.name} Overview` }]
+        }))
+    };
+
+    const adaptedActiveSelection = {
+        unitIndex: activeChapterIndex,
+        topicIndex: 0
+    };
+
+    function handlePlaylistSelect(index) {
+        setActivePlaylistIndex(index);
+        setActiveChapterIndex(0);
         setSelectedVideo(null);
     }
 
-    function handleTopicSelect(
-        unitIndex,
-        topicIndex
-    ) {
-        setActiveSelection({
-            unitIndex,
-            topicIndex,
-        });
-
+    function handleTopicSelect(unitIndex) {
+        setActiveChapterIndex(unitIndex);
         setSelectedVideo(null);
     }
 
@@ -106,15 +120,15 @@ export default function DisplayCookedCourse() {
     return (
         <div className="flex h-screen bg-white font-mono text-slate-900">
             <PlaylistsViewerSidebar
-                currentPlaylist={currentPlaylist}
-                activeSelection={activeSelection}
-                onTopicSelect={handleTopicSelect}
+                currentPlaylist={adaptedCurrentPlaylist}
+                activeSelection={adaptedActiveSelection}
+                onTopicSelect={(unitIndex, _) => handleTopicSelect(unitIndex)}
             />
             <main className="flex-1 flex flex-col overflow-hidden">
                 <PlaylistViewerHeader
-                    playlists={playlists}
+                    playlists={adaptedPlaylists}
                     onPlaylistSelect={handlePlaylistSelect}
-                    activePlaylist={activePlaylist}
+                    activePlaylist={activePlaylistIndex}
                 />
 
                 <div className="flex-1 relative overflow-hidden">
@@ -122,9 +136,7 @@ export default function DisplayCookedCourse() {
 
                         <div className="flex items-baseline gap-2 mb-6">
                             <h2 className="text-sm font-medium">
-                                {
-                                    currentTopic?.topicName
-                                }
+                                {currentChapter?.name} Overview
                             </h2>
 
                             <span className="text-xs text-slate-400">
@@ -132,62 +144,55 @@ export default function DisplayCookedCourse() {
                             </span>
                         </div>
                         <div className="divide-y divide-slate-100">
-                            {videos.map(
-                                (video, i) => (
-                                    <div
-                                        key={i}
-                                        className="flex items-start gap-3 py-4 cursor-pointer group"
-                                        onClick={() =>
-                                            setSelectedVideo(
-                                                video
-                                            )
-                                        }
-                                    >
-                                        <div className="w-16 h-10 shrink-0 bg-slate-50 border border-slate-100 rounded flex items-center justify-center">
-                                            <svg width="10" height="12" viewBox="0 0 10 12" fill="none" >
-                                                <polygon
-                                                    points="0,0 10,6 0,12" fill="#d4d4d8"
-                                                />
-                                            </svg>
-                                        </div>
-
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-xs font-medium text-slate-700 group-hover:text-slate-900 transition-colors mb-1 leading-snug">
-                                                {video}
-                                            </p>
-
-                                            <p className="text-[11px] text-slate-400 mb-2">
-                                                10 mins
-                                            </p>
-
-                                            <button
-                                                className="text-[11px] text-slate-400 hover:text-slate-700 transition-colors flex items-center gap-1"
-                                                onClick={(e) => { e.stopPropagation(); setSelectedVideo(video); }}
-                                            >
-                                                <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" strokeWidth="1.2">
-                                                    <circle cx="5.5" cy="5.5" r="4.5" />
-                                                    <path
-                                                        d="M5.5 3.5v2.5M5.5 7.5v.2"
-                                                        strokeLinecap="round"
-                                                    />
-                                                </svg>
-
-                                                Why this?
-                                            </button>
-                                        </div>
+                            {videos.map((video) => (
+                                <div
+                                    key={video.id}
+                                    className="flex items-start gap-3 py-4 cursor-pointer group"
+                                    onClick={() => setSelectedVideo(video)}
+                                >
+                                    <div className="w-16 h-10 shrink-0 bg-slate-50 border border-slate-100 rounded flex items-center justify-center">
+                                        <svg width="10" height="12" viewBox="0 0 10 12" fill="none" >
+                                            <polygon points="0,0 10,6 0,12" fill="#d4d4d8" />
+                                        </svg>
                                     </div>
-                                )
+
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-xs font-medium text-slate-700 group-hover:text-slate-900 transition-colors mb-1 leading-snug">
+                                            {video.title}
+                                        </p>
+
+                                        <p className="text-[11px] text-slate-400 mb-2">
+                                            {video.duration}
+                                        </p>
+
+                                        <button
+                                            className="text-[11px] text-slate-400 hover:text-slate-700 transition-colors flex items-center gap-1"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setSelectedVideo(video);
+                                            }}
+                                        >
+                                            <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" strokeWidth="1.2">
+                                                <circle cx="5.5" cy="5.5" r="4.5" />
+                                                <path d="M5.5 3.5v2.5M5.5 7.5v.2" strokeLinecap="round" />
+                                            </svg>
+                                            Why this?
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+
+                            {videos.length === 0 && (
+                                <div className="text-xs text-slate-400 py-6 text-center">
+                                    No matched videos found for this chapter.
+                                </div>
                             )}
                         </div>
                     </div>
                     {selectedVideo && (
                         <VideoInsight
                             video={selectedVideo}
-                            onClose={() =>
-                                setSelectedVideo(
-                                    null
-                                )
-                            }
+                            onClose={() => setSelectedVideo(null)}
                         />
                     )}
                 </div>

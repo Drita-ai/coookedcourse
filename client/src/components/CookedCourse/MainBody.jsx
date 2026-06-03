@@ -66,24 +66,20 @@ function MainBody() {
         setError(null);
 
         // Extract Units and Syllabus
-        const syllabus = units.map(unit => ({
-            id: unit.id,
-            unit: unit.name,
-            topics: unit.topics
-        }));
+        const syllabus = units.reduce((acc, unit) => { acc[`Unit${unit.id}`] = unit.topics; return acc; }, {});
 
         // TODO: Get Client Properly 
         const courseData = {
             subject,
             syllabus,
-            client: "0c458858-4cff-46ab-a8ec-5ae97c511668"
+            client: "a2d2253e-1cd1-4ac7-bd9a-3b180902fd94"
         };
 
         try {
             // TODO: Get Generated Playlist Id
             setIsLoading(false)
             // Then, navigate
-            navigate(`/display-cooked-course/0c458858-4cff-46ab-a8ec-5ae97c511668`, { state: { data: courseData } });
+            navigate(`/display-cooked-course/a2d2253e-1cd1-4ac7-bd9a-3b180902fd94`, { state: { data: courseData } });
         } catch (err) {
             setError(err.message);
         } finally {
