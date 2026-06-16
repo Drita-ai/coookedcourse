@@ -51,6 +51,7 @@ export default function DisplayCookedCourse() {
         : null;
 
     const rawVideos = currentAnalysis?.videos || [];
+    const rawFallbackVideos = currentAnalysis?.fallbackVideos || []; // unmatched topics
 
     // Data expected by VideoInsight
     const videos = rawVideos.map((video) => ({
@@ -62,6 +63,19 @@ export default function DisplayCookedCourse() {
         timestamps: [
             { t: "0:00", label: "Topic Introduction" },
             { t: "4:30", label: "Core Core Concept & Example Walkthrough" }
+        ]
+    }));
+
+    const fallbackVideos = rawFallbackVideos.map((video) => ({
+        id: video.ytVideoId,
+        title: video.ytVideoTitle,
+        topicName: video.topicName,
+        insight: `Automated dynamic recovery video brought in to fully cover the missed syllabus topic: "${video.topicName}".`,
+        coveragePct: 100, // Explicit single target topic resolution
+        duration: "Quick Study",
+        isFallback: true,
+        timestamps: [
+            { t: "0:00", label: `Explaining ${video.topicName}` }
         ]
     }));
 
@@ -140,11 +154,49 @@ export default function DisplayCookedCourse() {
                             </h2>
 
                             <span className="text-xs text-slate-400">
-                                {videos.length} videos
+                                {videos.length} core videos {fallbackVideos.length > 0 && `+ ${fallbackVideos.length} fallback additions`}
                             </span>
                         </div>
                         <div className="divide-y divide-slate-100">
                             {videos.map((video) => (
+                                <div
+                                    key={video.id}
+                                    className="flex items-start gap-3 py-4 cursor-pointer group"
+                                    onClick={() => setSelectedVideo(video)}
+                                >
+                                    <div className="w-16 h-10 shrink-0 bg-slate-50 border border-slate-100 rounded flex items-center justify-center">
+                                        <svg width="10" height="12" viewBox="0 0 10 12" fill="none" >
+                                            <polygon points="0,0 10,6 0,12" fill="#d4d4d8" />
+                                        </svg>
+                                    </div>
+
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-xs font-medium text-slate-700 group-hover:text-slate-900 transition-colors mb-1 leading-snug">
+                                            {video.title}
+                                        </p>
+
+                                        <p className="text-[11px] text-slate-400 mb-2">
+                                            {video.duration}
+                                        </p>
+
+                                        <button
+                                            className="text-[11px] text-slate-400 hover:text-slate-700 transition-colors flex items-center gap-1"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setSelectedVideo(video);
+                                            }}
+                                        >
+                                            <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" strokeWidth="1.2">
+                                                <circle cx="5.5" cy="5.5" r="4.5" />
+                                                <path d="M5.5 3.5v2.5M5.5 7.5v.2" strokeLinecap="round" />
+                                            </svg>
+                                            Why this?
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+
+                            {fallbackVideos.map((video) => (
                                 <div
                                     key={video.id}
                                     className="flex items-start gap-3 py-4 cursor-pointer group"
