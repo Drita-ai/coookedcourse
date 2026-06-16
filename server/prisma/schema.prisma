@@ -47,6 +47,18 @@ model ChapterAnalysis {
   chapter   Chapter @relation(fields: [chapterId], references: [id])
 
   matchedYoutubeTitles MatchedYoutubeTitle[]
+
+  fallbackVideos ChapterAnalysisFallback[]
+}
+
+model ChapterAnalysisFallback {
+  id           String @id @default(cuid())
+  topicName    String
+  ytVideoTitle String
+  ytVideoId    String
+
+  chapterAnalysisId String
+  chapterAnalysis   ChapterAnalysis @relation(fields: [chapterAnalysisId], references: [id])
 }
 
 model MatchedYoutubeTitle {
