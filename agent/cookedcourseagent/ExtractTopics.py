@@ -4,26 +4,26 @@ import json
 import re
 
 _COOKED_COURSE_PROMPT_TEMPLATE = """
-You are given a subject syllabus in JSON format. Your task is to extract and restructure it into a well-structured JSON with Units, their main sections, and topics.
+You are given a subject's syllabus in List of String format. Your task is to extract 
+and restructure it into a well-structured List of dictionary with, their main 
+sections, and topics.
 
 ### Input Syllabus:
 {subject_syllabus}
 
 ### Instructions:
-1. Output **ONLY** valid JSON.
+1. Output **ONLY** valid List of dictionary.
 2. For each Unit, identify the **main section names** (e.g., "Introduction", "Stacks and Queues", "Sorting and Hashing", "Hashing").
 3. Under each section, list all **topics as an array of strings**.
 4. If multiple sections exist inside the same unit, represent each as a separate object in a list.
 5. Do NOT include explanations, extra text, or code fences.
 6. Ensure the final JSON follows exactly this schema and nothing else:
-   {{
-       "UnitX": [
-           {{
-               "name": "<Section Name>",
-               "topics": ["<topic1>", "<topic2>", ...]
-           }}
-       ]
-   }}
+   [
+        {{
+            "name": "<Section Name>",
+            "topics": ["<topic1>", "<topic2>", ...]
+        }}
+   ]
 """
 class ExtractTopics:
     """
