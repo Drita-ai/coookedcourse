@@ -17,9 +17,13 @@ sections, and topics.
 3. Under each section, list all **topics as an array of strings**.
 4. If multiple sections exist inside the same unit, represent each as a separate object in a list.
 5. Do NOT include explanations, extra text, or code fences.
+7. Add a "unit" field to every object. The value must be the 1-based index of the 
+   input syllabus entry from which the section was extracted. If multiple sections 
+   are extracted from the same syllabus entry, they must all have the same "unit" value.
 6. Ensure the final JSON follows exactly this schema and nothing else:
    [
         {{
+            "unit": <1 based index of input>,
             "name": "<Section Name>",
             "topics": ["<topic1>", "<topic2>", ...]
         }}
