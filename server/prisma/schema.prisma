@@ -14,25 +14,11 @@ model User {
   clientId String @unique
 }
 
-model Syllabus {
-  id       String @id @default(cuid())
-  syllabus String
-  unitId   String @unique
-  unit     Unit   @relation(fields: [unitId], references: [id])
-}
-
-model Unit {
-  id       String    @id @default(cuid())
-  chapter  Chapter[]
-  syllabus Syllabus?
-}
-
 model Chapter {
   id              String            @id @default(cuid())
   name            String
+  chapterData     String
   topics          String[]
-  unitId          String
-  unit            Unit              @relation(fields: [unitId], references: [id])
   chapterAnalysis ChapterAnalysis[]
 }
 
