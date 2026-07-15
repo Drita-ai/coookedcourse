@@ -8,6 +8,7 @@ import { generateCourse } from '../services/generateCourse';
 
 export default function DisplayCookedCourse() {
     const [navChapters, setNavChapters] = useState([]);
+    const [navSubTopics, setNavSubTopics] = useState([])
     const [channels, setChannels] = useState([]);
     const [analysisMap, setAnalysisMap] = useState({});
     const [status, setStatus] = useState("loading");
@@ -24,7 +25,7 @@ export default function DisplayCookedCourse() {
 
                 const res = await generateCourse(courseDataToPost.data);
                 const responseData = res.data ? res.data : res;
-
+                console.log(responseData)
                 if (responseData.message === "success") {
                     setNavChapters(responseData.navChapters || []);
                     setChannels(responseData.channels || []);
@@ -44,6 +45,7 @@ export default function DisplayCookedCourse() {
 
     const currentChannel = channels[activePlaylistIndex] || "";
     const currentChapter = navChapters[activeChapterIndex] || null;
+    const { matchedSyllabusTopics, unmatchedSyllabusTopics } = analysisMap[currentChannel]?.[currentChapter.id] || {};
 
     // Extract data node matching current selection
     const currentAnalysis = (currentChannel && currentChapter)
@@ -137,6 +139,8 @@ export default function DisplayCookedCourse() {
                 currentPlaylist={adaptedCurrentPlaylist}
                 activeSelection={adaptedActiveSelection}
                 onTopicSelect={(unitIndex, _) => handleTopicSelect(unitIndex)}
+                matchedSyllabusTopics={matchedSyllabusTopics}
+                unmatchedSyllabusTopics={unmatchedSyllabusTopics}
             />
             <main className="flex-1 flex flex-col overflow-hidden">
                 <PlaylistViewerHeader
