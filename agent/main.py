@@ -22,7 +22,7 @@ class Syllabus(BaseModel):
     syllabus: list[str]
 
 class YTAndSyllabusTopics(BaseModel):
-    syllabus_topics: dict
+    syllabus_topics: list[dict]
     channel_topics: dict
 
 class SyllabusAnalysis(BaseModel):
@@ -62,16 +62,6 @@ async def analyze_topics(payload: YTAndSyllabusTopics):
         
         structured_llm = llm.with_structured_output(AnalysisResponse)
         
-        combined_syllabus = []
-        
-        # Iterate over syllabus topics
-        for _, syllabus_topic  in syllabus_topics.items():
-            for topic in syllabus_topic:
-                combined_syllabus.append({
-                    "name": topic['name'],
-                    "topics": topic['topics']
-                })
-        
         aggregated_llm_res = []
         
         # Iterate over Playlists
@@ -85,7 +75,7 @@ async def analyze_topics(payload: YTAndSyllabusTopics):
         
             res = chain.invoke(
                 input={
-                    "syllabus_units": combined_syllabus, 
+                    "syllabus_units": syllabus_topics, 
                     "playlist_video_titles": video_titles
                 })
             
