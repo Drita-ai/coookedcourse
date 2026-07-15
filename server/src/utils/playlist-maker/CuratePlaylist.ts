@@ -8,13 +8,13 @@ import type { CollegeAnalysis, QueryString, VideoListItem } from '../../types/pl
 import { APIFeature } from '../APIFeatures';
 
 export class CuratePlaylist {
-    private topics: CookedTopics;
+    private topics;
     private subject: string;
     private SEARCH_PLAYLIST_URL: string;
     private MAX_PLAYLISTS_TO_FETCH: string;
     public extractedTopics?: string[];
 
-    constructor(topics: CookedTopics, subject: string) {
+    constructor(topics, subject: string) {
         this.topics = topics
         this.subject = subject
         this.SEARCH_PLAYLIST_URL = this.makePlaylistURL()
@@ -43,7 +43,7 @@ export class CuratePlaylist {
 
         const playlistsItem = await fetchTemplate(cacheKey, this.SEARCH_PLAYLIST_URL)
 
-        return playlistsItem
+        return playlistsItem;
     }
 
     /**

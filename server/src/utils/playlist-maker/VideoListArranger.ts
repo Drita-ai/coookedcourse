@@ -83,7 +83,7 @@ export class VideoListArranger {
          *      i) MATCHED TOPICS ( with quantity )
          *      ii) UNMATCHED TOPICS ( with quantity )
          */
-        const payload: LLMPassedSyllabusYoutubeTopics = {
+        const payload = {
             syllabus_topics: syllabusTopics,
             channel_topics: videoTitles
         }
