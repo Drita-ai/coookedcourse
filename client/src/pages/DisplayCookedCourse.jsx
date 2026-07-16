@@ -5,6 +5,7 @@ import VideoInsight from '../components/CookedPlaylist/VideoInsight';
 import PlaylistsViewerSidebar from '../components/CookedPlaylist/PlylistsViewerSidebar';
 import PlaylistViewerHeader from '../components/CookedPlaylist/PlaylistViewerHeader';
 import { generateCourse } from '../services/generateCourse';
+import PlaylistInsight from '../components/CookedPlaylist/PlaylistInsight';
 
 export default function DisplayCookedCourse() {
     const [navChapters, setNavChapters] = useState([]);
@@ -15,6 +16,7 @@ export default function DisplayCookedCourse() {
     const [activePlaylistIndex, setActivePlaylistIndex] = useState(0);
     const [activeChapterIndex, setActiveChapterIndex] = useState(0);
     const [selectedVideo, setSelectedVideo] = useState(null);
+    const [isPlaylistInsightVisible, setIsPlaylistInsightVisible] = useState(true);
 
     const courseDataToPost = useLocation().state;
 
@@ -149,6 +151,8 @@ export default function DisplayCookedCourse() {
                     activePlaylist={activePlaylistIndex}
                 />
 
+                {isPlaylistInsightVisible && <PlaylistInsight />}
+
                 <div className="flex-1 relative overflow-hidden">
                     <div className="h-full overflow-y-auto px-5 py-5">
 
@@ -160,6 +164,15 @@ export default function DisplayCookedCourse() {
                             <span className="text-xs text-slate-400">
                                 {videos.length} core videos {fallbackVideos.length > 0 && `+ ${fallbackVideos.length} fallback additions`}
                             </span>
+
+                            <div>
+                                <button
+                                    className='ml-4 text-xs bg-gray-800 p-2 text-white rounded-lg hover:cursor-pointer'
+                                    onClick={() => setIsPlaylistInsightVisible((prev) => !prev)}
+                                >
+                                    Show Details
+                                </button>
+                            </div>
                         </div>
                         <div className="divide-y divide-slate-100">
                             {videos.map((video) => (
